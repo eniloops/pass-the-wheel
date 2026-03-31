@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pass the Wheel — WA Driving Test Prep</title>
+<style>
+  :root {
+    --bg: #f9f8f6;
+    --surface: #ffffff;
+    --surface2: #f2f1ee;
+    --border: rgba(0,0,0,0.09);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1a1a1a;
+    --text2: #666;
+    --text3: #999;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-dark: #085041;
+    --red: #E24B4A;
+    --red-light: #FCEBEB;
+    --red-dark: #791F1F;
+    --blue: #378ADD;
+    --blue-light: #E6F1FB;
+    --blue-dark: #0C447C;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --amber-dark: #633806;
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+    --purple-dark: #3C3489;
+    --radius: 12px;
+    --radius-sm: 7px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HERO BANNER */
+  .hero {
+    background: var(--text);
+    padding: 2.5rem 1.5rem 2.25rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(29,158,117,0.12);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; right: -40px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: rgba(55,138,221,0.08);
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: rgba(29,158,117,0.15);
+    padding: 4px 14px;
+    border-radius: 99px;
+    margin-bottom: 1.1rem;
+  }
+  .hero h1 {
+    font-size: clamp(26px, 5vw, 38px);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    letter-spacing: -.5px;
+    margin-bottom: .6rem;
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 span { color: var(--teal); }
+  .hero-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+    max-width: 440px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-pills {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-pill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 99px;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.65);
+  }
+
+  /* LAYOUT */
+  .app { max-width: 780px; margin: 0 auto; padding: 1.75rem 1.25rem 5rem; }
+
+  /* SAVE BADGE */
+  .save-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 1.25rem;
+    padding: .6rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .save-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--teal);
+    flex-shrink: 0;
+  }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; background: var(--surface2); padding: 4px; border-radius: var(--radius); margin-bottom: 1.75rem; }
+  .tab { flex: 1; padding: 8px 4px; font-size: 12px; border: none; background: transparent; color: var(--text2); border-radius: var(--radius-sm); cursor: pointer; transition: all .15s; font-weight: 500; }
+  .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* STATS */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; }
+  .stat .n { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat .l { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .stat.pass .n { color: var(--teal); }
+
+  /* CATEGORY BUTTONS */
+  .cat-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .cat-btn { padding: 6px 14px; font-size: 12px; font-weight: 500; border: 1px solid var(--border2); border-radius: 99px; cursor: pointer; background: var(--surface); color: var(--text2); transition: all .15s; }
+  .cat-btn.active { background: var(--text); color: white; border-color: var(--text); }
+
+  /* PROGRESS BAR */
+  .pbar { height: 4px; background: var(--surface2); border-radius: 2px; margin-bottom: 1.25rem; overflow: hidden; }
+  .pfill { height: 100%; background: var(--teal); border-radius: 2px; transition: width .4s; }
+
+  /* QUESTION CARD */
+  .qcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; }
+  .topic-pill { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 99px; margin-bottom: 1rem; letter-spacing: .5px; text-transform: uppercase; }
+  .pill-signs { background: var(--blue-light); color: var(--blue-dark); }
+  .pill-laws  { background: var(--teal-light); color: var(--teal-dark); }
+  .pill-row   { background: var(--amber-light); color: var(--amber-dark); }
+  .pill-dui   { background: var(--red-light); color: var(--red-dark); }
+  .pill-safe  { background: var(--purple-light); color: var(--purple-dark); }
+  .qnum { font-size: 11px; color: var(--text3); margin-bottom: 8px; }
+  .qtext { font-size: 16px; font-weight: 500; color: var(--text); line-height: 1.6; margin-bottom: 1.4rem; }
+
+  /* OPTIONS */
+  .opt { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 9px; transition: all .15s; font-size: 14px; color: var(--text); line-height: 1.5; }
+  .opt:hover { border-color: var(--border2); background: var(--surface2); }
+  .opt .lt { font-weight: 700; min-width: 20px; color: var(--text3); flex-shrink: 0; }
+  .opt.correct { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); pointer-events: none; }
+  .opt.correct .lt { color: var(--teal); }
+  .opt.wrong { border-color: var(--red); background: var(--red-light); color: var(--red-dark); pointer-events: none; }
+  .opt.wrong .lt { color: var(--red); }
+  .opt.dimmed { pointer-events: none; opacity: .4; }
+
+  /* EXPLANATION */
+  .expl { margin-top: 1.25rem; padding: 1rem 1.25rem; background: var(--teal-light); border-left: 3px solid var(--teal); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; display: none; }
+  .expl.show { display: block; }
+  .expl .elabel { font-size: 10px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+  .expl p { font-size: 13px; color: var(--teal-dark); line-height: 1.7; }
+
+  /* NAV ROW */
+  .navrow { display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem; }
+  .streak { font-size: 12px; color: var(--text3); }
+  .streak strong { color: var(--amber); }
+
+  /* BUTTONS */
+  .btn { padding: 9px 22px; border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; font-weight: 500; background: transparent; color: var(--text); transition: all .15s; }
+  .btn:hover { background: var(--surface2); }
+  .btn-p { background: var(--text); color: white; border-color: var(--text); }
+  .btn-p:hover { opacity: .85; background: var(--text); }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 3rem 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .empty-state h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 1.5rem; }
+
+  /* PLAN */
+  .plan-note { font-size: 13px; color: var(--text2); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; line-height: 1.7; }
+  .plan-note strong { color: var(--text); }
+  .week-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .wcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+  .wtitle { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .wsub { font-size: 11px; color: var(--text3); margin-bottom: 12px; }
+  .ditem { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .ditem:last-child { border-bottom: none; }
+  .dlabel { font-size: 11px; font-weight: 700; color: var(--text3); min-width: 28px; padding-top: 1px; flex-shrink: 0; }
+  .dtask { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+  /* TIPS */
+  .tips-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+  .tips-header { font-size: 11px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 1rem; }
+  .tip-item { display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+  .tip-item:last-child { border-bottom: none; }
+  .tip-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .ttitle { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .ttext { font-size: 12px; color: var(--text2); line-height: 1.65; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; margin-top: 6px; letter-spacing: .3px; }
+  .tag-hot { background: var(--red-light); color: var(--red-dark); }
+  .tag-wa { background: var(--blue-light); color: var(--blue-dark); }
+  .tag-trick { background: var(--amber-light); color: var(--amber-dark); }
+
+  /* SIMULATOR */
+  .sim-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .sim-prog-label { font-size: 14px; font-weight: 500; color: var(--text); }
+  .sim-score-live { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .sim-timer { font-size: 26px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+  .sim-result { text-align: center; padding: 2.5rem 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .sim-score-big { font-size: 64px; font-weight: 800; line-height: 1; }
+  .sim-score-big.pass { color: var(--teal); }
+  .sim-score-big.fail { color: var(--red); }
+  .sim-verdict { font-size: 20px; font-weight: 700; margin: 8px 0 4px; }
+  .sim-sub { font-size: 14px; color: var(--text2); margin-bottom: 1.5rem; line-height: 1.5; }
+  .sim-breakdown { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 1.5rem 0; }
+  .sb-item { background: var(--surface2); border-radius: var(--radius-sm); padding: .9rem; text-align: center; }
+  .sb-n { font-size: 22px; font-weight: 700; }
+  .sb-l { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .sim-start-card { text-align: center; padding: 3rem 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .sim-icon { font-size: 48px; margin-bottom: 1.1rem; }
+  .sim-start-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .sim-start-card p { font-size: 14px; color: var(--text2); margin-bottom: 1.75rem; line-height: 1.6; max-width: 360px; margin-left: auto; margin-right: auto; }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 2rem 0 1rem; font-size: 12px; color: var(--text3); }
+  .footer a { color: var(--teal); text-decoration: none; }
+
+  @media (max-width: 580px) {
+    .stat-row { grid-template-columns: repeat(2,1fr); }
+    .week-grid { grid-template-columns: 1fr; }
+    .tabs { gap: 2px; }
+    .tab { font-size: 10px; padding: 7px 2px; }
+    .hero h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO BANNER -->
+<div class="hero">
+  <div class="hero-eyebrow">Washington State · DOL Knowledge Test</div>
+  <h1>Study smart.<br><span>Pass the wheel.</span></h1>
+  <p class="hero-sub">The free study tool that actually explains why — not just what. Built on the official WA Driver Guide.</p>
+  <div class="hero-pills">
+    <div class="hero-pill">65 real exam questions</div>
+    <div class="hero-pill">Challenge bank</div>
+    <div class="hero-pill">Full exam simulator</div>
+    <div class="hero-pill">100% free · no login</div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- SAVE BADGE -->
+  <div class="save-badge">
+    <div class="save-dot"></div>
+    <span id="save-status">Your progress saves automatically to this browser.</span>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('practice')">Practice</button>
+    <button class="tab" onclick="showTab('challenge')">Challenge bank</button>
+    <button class="tab" onclick="showTab('simulator')">Exam sim</button>
+    <button class="tab" onclick="showTab('plan')">2-week plan</button>
+    <button class="tab" onclick="showTab('tips')">Exam secrets</button>
+  </div>
+
+  <!-- PRACTICE -->
+  <div id="practice" class="section active">
+    <div class="stat-row">
+      <div class="stat"><div class="n" id="s-correct">0</div><div class="l">Correct</div></div>
+      <div class="stat"><div class="n" id="s-total">0</div><div class="l">Answered</div></div>
+      <div class="stat pass"><div class="n" id="s-pct">—</div><div class="l">Score</div></div>
+      <div class="stat"><div class="n" id="s-streak">0</div><div class="l">Streak</div></div>
+    </div>
+    <div class="cat-row">
+      <button class="cat-btn active" data-cat="all" onclick="selectCat(this)">All topics</button>
+      <button class="cat-btn" data-cat="signs" onclick="selectCat(this)">Road signs</button>
+      <button class="cat-btn" data-cat="laws" onclick="selectCat(this)">WA laws</button>
+      <button class="cat-btn" data-cat="row" onclick="selectCat(this)">Right-of-way</button>
+      <button class="cat-btn" data-cat="dui" onclick="selectCat(this)">DUI & alcohol</button>
+      <button class="cat-btn" data-cat="safe" onclick="selectCat(this)">Safe driving</button>
+    </div>
+    <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+    <div class="qcard">
+      <div class="topic-pill pill-signs" id="q-topic">Road signs</div>
+      <div class="qnum" id="q-num">Question 1</div>
+      <div class="qtext" id="q-text">Loading...</div>
+      <div id="q-opts"></div>
+      <div class="expl" id="q-expl"><div class="elabel">Why this answer</div><p id="q-expl-text"></p></div>
+      <div class="navrow">
+        <div class="streak">Streak: <strong id="s-streak2">0</strong></div>
+        <button class="btn btn-p" id="q-next" onclick="nextPractice()" style="display:none">Next question →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHALLENGE BANK -->
+  <div id="challenge" class="section">
+    <div id="chal-empty" class="empty-state">
+      <h3>Challenge bank is empty</h3>
+      <p>Every question you miss in Practice or the Exam Sim gets added here automatically. Come back to drill your weak spots until you clear the bank.</p>
+      <button class="btn btn-p" onclick="showTab('practice')">Start practicing →</button>
+    </div>
+    <div id="chal-content" style="display:none">
+      <div class="stat-row">
+        <div class="stat"><div class="n" id="c-bank">0</div><div class="l">In bank</div></div>
+        <div class="stat"><div class="n" id="c-cleared">0</div><div class="l">Cleared</div></div>
+        <div class="stat"><div class="n" id="c-total">0</div><div class="l">Attempts</div></div>
+        <div class="stat pass"><div class="n" id="c-pct">—</div><div class="l">Rate</div></div>
+      </div>
+      <div class="pbar"><div class="pfill" id="c-pfill" style="width:0%"></div></div>
+      <div class="qcard">
+        <div class="topic-pill pill-signs" id="c-topic">Road signs</div>
+        <div class="qnum" id="c-num">Drilling your weak spots</div>
+        <div class="qtext" id="c-text">Loading...</div>
+        <div id="c-opts"></div>
+        <div class="expl" id="c-expl"><div class="elabel">Why this answer</div><p id="c-expl-text"></p></div>
+        <div class="navrow">
+          <span class="streak" id="c-status"></span>
+          <button class="btn btn-p" id="c-next" onclick="nextChallenge()" style="display:none">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIMULATOR -->
+  <div id="simulator" class="section">
+    <div id="sim-start">
+      <div class="sim-start-card">
+        <div class="sim-icon">🎯</div>
+        <h2>Full exam simulation</h2>
+        <p>40 questions · timed · same format as the real WA DOL test. You need 32 correct (80%) to pass.</p>
+        <button class="btn btn-p" onclick="startSim()">Start simulation →</button>
+      </div>
+    </div>
+    <div id="sim-running" style="display:none">
+      <div class="sim-header">
+        <div>
+          <div class="sim-prog-label" id="sim-prog">Question 1 of 40</div>
+          <div class="sim-score-live" id="sim-score-live">Score: 0 / 0</div>
+        </div>
+        <div class="sim-timer" id="sim-timer">00:00</div>
+      </div>
+      <div class="pbar"><div class="pfill" id="sim-pfill" style="width:2.5%"></div></div>
+      <div class="qcard">
+        <div class="topic-pill pill-signs" id="sim-topic">Road signs</div>
+        <div class="qtext" id="sim-text">Loading...</div>
+        <div id="sim-opts"></div>
+        <div class="expl" id="sim-expl"><div class="elabel">Why this answer</div><p id="sim-expl-text"></p></div>
+        <div class="navrow">
+          <span style="font-size:12px;color:var(--text3)" id="sim-remain"></span>
+          <button class="btn btn-p" id="sim-next" onclick="nextSim()" style="display:none">Next →</button>
+        </div>
+      </div>
+    </div>
+    <div id="sim-result" style="display:none">
+      <div class="sim-result">
+        <div class="sim-score-big" id="sr-pct">—</div>
+        <div class="sim-verdict" id="sr-verdict">—</div>
+        <div class="sim-sub" id="sr-sub">—</div>
+        <div class="sim-breakdown">
+          <div class="sb-item"><div class="sb-n" id="sr-correct" style="color:var(--teal)">—</div><div class="sb-l">Correct</div></div>
+          <div class="sb-item"><div class="sb-n" id="sr-wrong" style="color:var(--red)">—</div><div class="sb-l">Wrong</div></div>
+          <div class="sb-item"><div class="sb-n" id="sr-time">—</div><div class="sb-l">Time</div></div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn" onclick="startSim()">Try again</button>
+          <button class="btn btn-p" onclick="showTab('challenge')">Drill weak spots →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2-WEEK PLAN -->
+  <div id="plan" class="section">
+    <div class="plan-note">
+      The real WA DOL test: <strong>40 questions, 32 correct to pass (80%)</strong>. Topics: road signs, traffic laws, right-of-way, DUI, and safe driving. Thirty minutes a day is enough.
+    </div>
+    <div class="week-grid">
+      <div class="wcard">
+        <div class="wtitle">Week 1 — build the foundation</div>
+        <div class="wsub">One topic per day, then a full simulation</div>
+        <div class="ditem"><span class="dlabel">Mon</span><span class="dtask">Road signs — shapes, colors, meanings. Use the "Road signs" filter.</span></div>
+        <div class="ditem"><span class="dlabel">Tue</span><span class="dtask">WA traffic laws — speed limits, headlights in rain, signals.</span></div>
+        <div class="ditem"><span class="dlabel">Wed</span><span class="dtask">Right-of-way — 4-way stops, roundabouts, pedestrians.</span></div>
+        <div class="ditem"><span class="dlabel">Thu</span><span class="dtask">DUI & alcohol — BAC limits, implied consent, consequences.</span></div>
+        <div class="ditem"><span class="dlabel">Fri</span><span class="dtask">Safe driving — following distance, skidding, school buses.</span></div>
+        <div class="ditem"><span class="dlabel">Sat</span><span class="dtask">Run the Exam Simulation. Note your score and weak topics.</span></div>
+        <div class="ditem"><span class="dlabel">Sun</span><span class="dtask">Challenge bank only — drill every question you missed this week.</span></div>
+      </div>
+      <div class="wcard">
+        <div class="wtitle">Week 2 — lock it in</div>
+        <div class="wsub">Simulations + targeted drilling</div>
+        <div class="ditem"><span class="dlabel">Mon</span><span class="dtask">Deep dive your weakest topic from week 1. 30+ questions.</span></div>
+        <div class="ditem"><span class="dlabel">Tue</span><span class="dtask">Exam simulation #2. Target: 85%+ this time.</span></div>
+        <div class="ditem"><span class="dlabel">Wed</span><span class="dtask">Advanced signs — pavement markings, construction zones, signals.</span></div>
+        <div class="ditem"><span class="dlabel">Thu</span><span class="dtask">Quick review all 5 topics, 10 questions each.</span></div>
+        <div class="ditem"><span class="dlabel">Fri</span><span class="dtask">Final simulation. Scoring 85%+ consistently → you're ready.</span></div>
+        <div class="ditem"><span class="dlabel">Sat</span><span class="dtask">Challenge bank only. Nothing new. Let your brain rest.</span></div>
+        <div class="ditem"><span class="dlabel">Sun</span><span class="dtask">Test day. Bring your ID + SSN. You've got this.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAM SECRETS -->
+  <div id="tips" class="section">
+    <div class="tips-card">
+      <div class="tips-header">Highest-frequency traps on the real WA DOL exam</div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--red-light)">🛑</div>
+        <div>
+          <div class="ttitle">4-way stop tie-breaker</div>
+          <div class="ttext">Same-time arrivals: yield to the car on your right. Opposite directions going straight: both can go. Turning left always yields to oncoming straight traffic — even if you arrived first.</div>
+          <span class="tag tag-hot">Most tested</span>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--amber-light)">⏱</div>
+        <div>
+          <div class="ttitle">3-second following distance</div>
+          <div class="ttext">Pick a fixed point. When the car ahead passes it, count 3 seconds. If you pass the point before counting to 3, you are too close. Double to 6 seconds in rain, fog, or ice.</div>
+          <span class="tag tag-hot">Most tested</span>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--blue-light)">🌧</div>
+        <div>
+          <div class="ttitle">Wipers on = headlights on (WA law)</div>
+          <div class="ttext">Washington law requires headlights whenever your wipers are running due to weather. Not a suggestion — it is a statute. Appears on almost every version of the exam.</div>
+          <span class="tag tag-wa">WA-specific</span>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--red-light)">🍺</div>
+        <div>
+          <div class="ttitle">Know all three BAC limits</div>
+          <div class="ttext">Adults 21+: 0.08%. Commercial drivers (CDL): 0.04%. Drivers under 21: 0.02%. Implied consent means by driving you agree to be tested. Refusing = automatic license suspension.</div>
+          <span class="tag tag-hot">Most tested</span>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--teal-light)">🚌</div>
+        <div>
+          <div class="ttitle">School bus red lights — both directions</div>
+          <div class="ttext">Stop in both directions when a school bus has flashing red lights — except on roads divided by a physical median (concrete wall or raised island). A painted center line does NOT count.</div>
+          <span class="tag tag-wa">WA-specific</span>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--amber-light)">🚸</div>
+        <div>
+          <div class="ttitle">School zone: 20 mph when kids are present</div>
+          <div class="ttext">You must slow to 20 mph when children are present — not just when the flasher is active. If you see kids near the roadway by a school, 20 mph is required regardless of the signal.</div>
+          <span class="tag tag-trick">Common trap</span>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--purple-light)">🟡</div>
+        <div>
+          <div class="ttitle">Yellow light = stop if you safely can</div>
+          <div class="ttext">The exam definition: a yellow light means the signal is about to turn red — slow down and stop if you can safely do so. "Speed up to make it" is always the wrong answer on the exam.</div>
+          <span class="tag tag-trick">Common trap</span>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--blue-light)">➡</div>
+        <div>
+          <div class="ttitle">Passing on the right is usually illegal</div>
+          <div class="ttext">In WA, passing on the right is only allowed when the road has two or more lanes going the same direction, or when the car ahead is turning left. Using the shoulder to pass is always illegal.</div>
+          <span class="tag tag-wa">WA-specific</span>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--teal-light)">🔵</div>
+        <div>
+          <div class="ttitle">Sign colors: blue = services, brown = recreation</div>
+          <div class="ttext">Blue signs mark services (gas, food, hospitals). Brown signs indicate parks and recreation. Green = directions and exits. Orange = construction zones. Yellow = warnings. White = regulations.</div>
+          <span class="tag tag-trick">Common trap</span>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon" style="background:var(--red-light)">⛽</div>
+        <div>
+          <div class="ttitle">Only time sobers you up</div>
+          <div class="ttext">Coffee, food, water, cold air, and exercise do not reduce your BAC or restore driving ability. Only time eliminates alcohol from your system. The exam always lists these as distractors.</div>
+          <span class="tag tag-hot">Most tested</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Pass the Wheel · Free WA DOL study tool · Based on the official Washington Driver Guide<br>
+    <span style="font-size:11px">Not affiliated with Washington DOL. Always study the official <a href="https://dol.wa.gov/driver-licenses-and-permits/driver-training-and-testing/driver-guides" target="_blank">WA Driver Guide</a>.</span>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {cat:'signs',q:'What shape is always used for STOP signs in the United States?',opts:['Circle','Triangle','Octagon','Diamond'],correct:2,expl:'An octagon (8-sided shape) is exclusively and universally used for stop signs. If you see an octagon, it is always a stop sign — no exceptions.'},
+  {cat:'signs',q:'A triangular sign with a red border and white background means:',opts:['Stop completely before proceeding','Slow down — yield to other traffic','A school zone ahead','No entry in this direction'],correct:1,expl:'The yield sign is an inverted triangle with a red border. It means slow down and give the right-of-way to crossing traffic. You only stop if traffic forces you to.'},
+  {cat:'signs',q:'What does a yellow diamond-shaped sign indicate?',opts:['A law you must follow','A warning about a hazard ahead','Road services nearby','A recreational area'],correct:1,expl:'Yellow diamond signs are warning signs. They alert you to upcoming hazards — curves, hills, slippery roads, animal crossings, etc. They warn rather than regulate.'},
+  {cat:'signs',q:'What does a flashing RED light at an intersection require you to do?',opts:['Slow down and proceed with caution','Yield to crossing traffic','Come to a complete stop, then proceed when safe','Stop and wait for it to turn green'],correct:2,expl:'A flashing red light is treated exactly like a stop sign. Come to a complete stop, then proceed only when it is safe and legal to do so.'},
+  {cat:'signs',q:'A white rectangular sign with black text is typically a:',opts:['Warning sign','Guide sign','Regulatory sign','Construction sign'],correct:2,expl:'White rectangular signs are regulatory signs — they tell you rules that must be followed: speed limits, no U-turn, keep right, do not pass, etc.'},
+  {cat:'signs',q:'What color are highway guide signs that show directions and distances?',opts:['Blue','White','Green','Brown'],correct:2,expl:'Green signs provide highway guidance — exit numbers, route directions, distances to cities. Blue = services. Brown = recreation. Orange = construction.'},
+  {cat:'signs',q:'A pennant-shaped yellow sign (pointing right) means:',opts:['Merge ahead','No passing zone begins here','Yield to oncoming traffic','Lane ends ahead'],correct:1,expl:'The pennant-shaped sign marks the beginning of a no-passing zone. It is placed on the left side of the road and points right, indicating passing is prohibited ahead.'},
+  {cat:'signs',q:'A sign showing a black X and the letters RR means:',opts:['Stop completely — train is coming','Railroad crossing — check both ways for trains','Restricted road ahead','Road is closed'],correct:1,expl:'The RR crossbuck sign marks a railroad crossing. Look both ways for trains and yield. A flashing red light means a train is coming — you must stop and wait.'},
+  {cat:'signs',q:'What does an orange sign typically indicate?',opts:['School zone','Construction or work zone ahead','Recreational area','Services available'],correct:1,expl:'Orange signs mark construction and maintenance work zones. Speed limits are strictly enforced in these zones and fines are typically doubled.'},
+  {cat:'signs',q:'What does a double solid yellow center line mean?',opts:['Passing is allowed for both directions','Passing is not permitted in either direction','You are on a one-way street','Bicycles may use the center lane'],correct:1,expl:'Double solid yellow lines mean no passing in either direction. Neither you nor oncoming traffic may cross these lines to pass.'},
+  {cat:'signs',q:'A broken (dashed) yellow center line means:',opts:['Passing is completely prohibited','Passing is permitted when safe','You are entering a construction zone','The road narrows ahead'],correct:1,expl:'A broken yellow center line means passing is allowed when it is safe to do so. You may cross the line to pass if the way is clear and you can complete the pass safely.'},
+  {cat:'signs',q:'What does a solid green arrow traffic signal mean?',opts:['Proceed with caution in that direction','Protected turn — oncoming traffic is stopped','Yield to oncoming traffic before turning','Check for pedestrians then proceed'],correct:1,expl:'A solid green arrow is a protected signal. Traffic from other directions is stopped by a red light. You may proceed in the direction of the arrow without yielding to oncoming vehicles.'},
+  {cat:'signs',q:'What does a blue sign with a white "H" indicate?',opts:['Highway entrance','Hospital nearby','Handicapped parking','Historical landmark'],correct:1,expl:'Blue highway signs with "H" indicate a hospital or medical facility is nearby. Blue signs generally mark motorist services including hospitals, gas, food, and lodging.'},
+  {cat:'signs',q:'A solid white edge line on the right side of the road marks:',opts:['A bicycle lane','The boundary of the travel lane','A turning zone','A no-parking area'],correct:1,expl:'A solid white edge line marks the right boundary of the travel lane, separating it from the shoulder. You generally should not cross it except to pull off the road safely.'},
+  {cat:'signs',q:'What does a flashing yellow light mean at an intersection?',opts:['Stop — then proceed when safe','Proceed with caution','The light is about to turn red','You have the right-of-way'],correct:1,expl:'A flashing yellow light means slow down and proceed with caution. You do not need to stop, but you must check for cross traffic and be prepared to yield.'},
+  {cat:'laws',q:'In Washington, when must you turn on your headlights?',opts:['Only after dark','Whenever your windshield wipers are in use due to rain','Only when visibility drops below 200 feet','Only in tunnels'],correct:1,expl:'Washington law (RCW 46.37.020) requires headlights whenever wipers are in use due to weather. This WA-specific law is frequently tested — it is a statute, not just a safety tip.'},
+  {cat:'laws',q:'What is the maximum speed limit on most rural interstate highways in Washington?',opts:['60 mph','65 mph','70 mph','75 mph'],correct:2,expl:'Washington\'s maximum speed limit on rural interstate highways is 70 mph. Urban interstates are typically 60 mph. Always follow posted signs — they override general limits.'},
+  {cat:'laws',q:'You must signal at least how far before turning or changing lanes?',opts:['50 feet','100 feet','200 feet','300 feet'],correct:1,expl:'Washington law requires signaling at least 100 feet before any turn or lane change. On highways and freeways, signal even earlier to give sufficient warning.'},
+  {cat:'laws',q:'When is it legal to make a right turn on a red light in Washington?',opts:['Never — red always means stop','After a complete stop and yielding to all traffic and pedestrians','Only if no sign prohibits it and you yield','Whenever traffic is clear, without stopping'],correct:1,expl:'You may turn right on red after a complete stop and after yielding to all crossing traffic and pedestrians — unless a posted "No Turn on Red" sign is present.'},
+  {cat:'laws',q:'You must carry your driver\'s license:',opts:['Only on highways','Only when traveling out of state','At all times when driving','Only on weekdays'],correct:2,expl:'You must have your driver\'s license in your possession whenever operating a vehicle in Washington. You must show it to law enforcement upon request.'},
+  {cat:'laws',q:'You see a stopped emergency vehicle with flashing lights ahead. You must:',opts:['Slow to 20 mph','Move to a non-adjacent lane if possible, or slow down significantly','Honk and continue at normal speed','Only slow down if it\'s blocking your lane'],correct:1,expl:'Washington\'s Move Over law requires moving to a non-adjacent lane when safe. If you cannot change lanes, slow to at least 10 mph under the posted limit to give safe clearance.'},
+  {cat:'laws',q:'What is the default speed limit in a Washington residential area when no sign is posted?',opts:['20 mph','25 mph','30 mph','35 mph'],correct:1,expl:'The default speed limit in urban and residential districts in Washington is 25 mph when no other limit is posted. Always check for posted signs that may set a different limit.'},
+  {cat:'laws',q:'Washington\'s handheld cell phone ban while driving applies:',opts:['Only on highways','Only when moving — not at red lights','At all times while operating a vehicle, including at red lights','Only when children are in the vehicle'],correct:2,expl:'Washington\'s DUIE law bans handheld device use while driving — including while stopped at red lights or in traffic. Only truly hands-free use is permitted.'},
+  {cat:'laws',q:'What must you do when you hear a siren or see lights from an approaching emergency vehicle?',opts:['Speed up to clear the road faster','Pull to the right edge and stop','Stop immediately wherever you are','Continue if you are in the left lane'],correct:1,expl:'Pull as far right as safely possible and stop until the emergency vehicle passes. Do not stop in an intersection — clear it first, then pull over.'},
+  {cat:'laws',q:'Washington law requires you to stop for pedestrians in:',opts:['Only marked crosswalks with painted lines','Only crosswalks with crossing signals','Both marked and unmarked crosswalks at intersections','Only when a crossing guard is present'],correct:2,expl:'Washington law protects pedestrians in both marked and unmarked crosswalks. An unmarked crosswalk exists at any intersection where sidewalks or pathways meet the roadway.'},
+  {cat:'laws',q:'You may not park within how many feet of a fire hydrant in Washington?',opts:['5 feet','10 feet','15 feet','20 feet'],correct:2,expl:'You must not park within 15 feet of a fire hydrant in Washington. This ensures emergency vehicles always have clear access.'},
+  {cat:'laws',q:'Washington\'s seat belt law requires:',opts:['Only the driver to wear one','Everyone in the front seat to wear one','Every occupant of the vehicle to wear one','Seat belts only on highways'],correct:2,expl:'Washington\'s seat belt law requires every person in the vehicle — front and back — to wear a properly fastened seat belt. The driver is responsible for ensuring all passengers comply.'},
+  {cat:'laws',q:'When may you legally pass on the right in Washington?',opts:['Whenever traffic ahead is slow','When the road has two or more lanes going the same direction','On a two-lane road if the shoulder is paved','Whenever the car ahead signals a left turn and the shoulder is clear'],correct:1,expl:'In WA, passing on the right is permitted only when the road has two or more lanes in the same direction, or when the vehicle ahead is turning left. Using the shoulder to pass is always illegal.'},
+  {cat:'laws',q:'At an uncontrolled railroad crossing, you should:',opts:['Accelerate to cross quickly','Slow down, look and listen in both directions, cross only when safe','Always stop completely, even if no train is visible','Treat it like a yield sign'],correct:1,expl:'At an uncontrolled railroad crossing, slow down, look both ways, and listen. Trains cannot stop quickly. Never race a train to a crossing — always yield to trains.'},
+  {cat:'row',q:'At a 4-way stop, Car A goes straight, Car B (from the opposite direction) turns left. They arrive simultaneously. Who goes first?',opts:['Car B — turning has priority','Car A — straight travel has priority over a left turn','They go at the same time','Whoever flashes headlights first'],correct:1,expl:'When two cars head in opposite directions, the car going straight has right-of-way over the car turning left. A left turn must always yield to oncoming straight-moving traffic.'},
+  {cat:'row',q:'At an uncontrolled intersection, two cars arrive at the same time. Who yields?',opts:['The car going straight','The car on the left — yield to the driver on your right','The car traveling faster','The car on the smaller road'],correct:1,expl:'At an uncontrolled intersection, yield to the driver on your right. This is the standard tie-breaker when no signals or signs are present and two cars arrive at the same time.'},
+  {cat:'row',q:'A pedestrian with a white cane is crossing the street. You must:',opts:['Honk to alert them and proceed carefully','Stop and yield until they have completely crossed','Stop only if they are directly in your path','Slow to 15 mph and proceed'],correct:1,expl:'You must always yield to visually impaired pedestrians using a white cane or guide dog. Stop completely and wait until they have fully crossed and cleared your path.'},
+  {cat:'row',q:'You want to turn left at a green light. A pedestrian is crossing in your path. You must:',opts:['Turn quickly before the pedestrian reaches your lane','Yield — pedestrians have right-of-way','Honk to ask them to wait','Proceed if the pedestrian is still on the curb'],correct:1,expl:'Pedestrians in crosswalks always have right-of-way over turning vehicles at a green light. Wait until they have completely cleared your lane before completing the turn.'},
+  {cat:'row',q:'You are entering a roundabout. Who has the right-of-way?',opts:['The entering vehicle','Vehicles already inside the roundabout','The vehicle approaching from the left','Whoever reaches the yield line first'],correct:1,expl:'Always yield to traffic already circulating inside a roundabout. Enter only when there is a safe gap. Never stop inside the roundabout unless traffic forces you to.'},
+  {cat:'row',q:'You are making a left turn from a two-lane road onto a two-lane road. You should turn into:',opts:['The far right lane of the new road','The nearest left lane (closest to the center line)','Either lane, whatever is convenient','The shoulder, then merge into a lane'],correct:1,expl:'When turning left, always turn into the leftmost lane of the road you are entering — the lane closest to the center. This keeps the turn tight, predictable, and safe.'},
+  {cat:'row',q:'You are at a yield sign. Oncoming traffic is approaching but there is a safe gap. You should:',opts:['Stop and wait until all traffic is gone','Slow and enter the gap if it is safe to do so','Stop at the line regardless of traffic','Proceed — yield signs only apply when busy'],correct:1,expl:'A yield sign means give right-of-way to crossing traffic. If a safe gap exists, you may proceed without stopping. You only stop if traffic forces you to.'},
+  {cat:'row',q:'A bicyclist is ahead in your lane. When passing, Washington law requires at least:',opts:['1 foot of clearance','2 feet of clearance','3 feet of clearance','5 feet of clearance'],correct:2,expl:'Washington law requires drivers to give cyclists at least 3 feet of clearance when passing. Pass only when it is safe and legal to do so.'},
+  {cat:'row',q:'You want to turn right. A cyclist is to your right, going straight. Who has right-of-way?',opts:['You — motor vehicles have priority','The cyclist — they are going straight and you are crossing their path','Whoever gets there first','Neither — both must yield'],correct:1,expl:'The cyclist going straight has right-of-way. When you turn right, you cross the cyclist\'s path. Yield and wait for a safe gap before completing your turn.'},
+  {cat:'row',q:'At a T-intersection, who yields?',opts:['The vehicle on the through road','The vehicle on the road that ends','The vehicle turning left','Whoever is moving faster'],correct:1,expl:'At a T-intersection, the driver on the road that ends must yield to traffic on the through (continuing) road. The through road always has priority.'},
+  {cat:'row',q:'You are backing out of a driveway. Who has right-of-way?',opts:['You — you were there first','Street traffic and pedestrians — yield to all','Whoever is moving faster','Pedestrians only, not vehicles'],correct:1,expl:'When backing out of a driveway, yield to all street traffic AND pedestrians on the sidewalk. You have no right-of-way. Proceed slowly and yield to everything.'},
+  {cat:'row',q:'An emergency vehicle with lights and siren is approaching from behind while you are in an intersection. You should:',opts:['Stop immediately in the intersection','Clear the intersection first, then pull right and stop','Speed up to exit the intersection faster','Stay in place and let the vehicle go around'],correct:1,expl:'If you are already in an intersection when an emergency vehicle approaches, clear the intersection first — then pull as far right as possible and stop. Never block emergency vehicles.'},
+  {cat:'dui',q:'What is the legal BAC limit for non-commercial drivers 21+ in Washington?',opts:['0.05%','0.08%','0.10%','0.12%'],correct:1,expl:'The legal limit is 0.08% BAC for adults 21 and older in Washington. At or above this level, you are legally impaired and can be charged with DUI.'},
+  {cat:'dui',q:'What does "implied consent" mean in Washington DUI law?',opts:['You consent to random roadside searches','By driving, you agree to chemical testing if an officer suspects DUI','You consent to a breathalyzer only','You consent to questioning without an attorney'],correct:1,expl:'Washington\'s implied consent law means that by operating a vehicle, you automatically agree to submit to breath, blood, or urine testing if an officer has grounds to suspect DUI.'},
+  {cat:'dui',q:'If you refuse a breath test after a lawful DUI arrest in Washington, what happens?',opts:['Nothing — you have the right to refuse','Your license is automatically suspended and the refusal can be used against you in court','You must take a blood test instead','You are immediately released'],correct:1,expl:'Refusing a breath or blood test results in automatic license revocation (1 year for first refusal) under implied consent. The refusal can also be used as evidence against you in court.'},
+  {cat:'dui',q:'Which of the following effectively reduces your BAC?',opts:['Drinking black coffee','Eating a large meal','Exercising or walking around','None of the above — only time reduces BAC'],correct:3,expl:'Nothing speeds up sobriety. Coffee, food, water, cold showers, and exercise do not reduce your BAC. Only your liver metabolizing alcohol over time lowers your BAC.'},
+  {cat:'dui',q:'A commercial truck driver in Washington is legally impaired at a BAC of:',opts:['0.08%','0.06%','0.04%','0.02%'],correct:2,expl:'Commercial drivers (CDL holders) have a stricter limit of 0.04% BAC — half the standard adult limit. This reflects the greater danger posed by large commercial vehicles.'},
+  {cat:'dui',q:'What BAC limit applies to drivers under 21 in Washington?',opts:['0.08%','0.05%','0.04%','0.02%'],correct:3,expl:'Washington has near-zero tolerance for underage drivers: 0.02% BAC. Even one drink can push someone past this level. Know this number — it appears frequently on the exam.'},
+  {cat:'dui',q:'Alcohol affects which driving skills first?',opts:['Steering control','Judgment, coordination, and reaction time','Physical strength','Color perception'],correct:1,expl:'Alcohol first impairs judgment — you think you\'re driving better than you are. It then impairs coordination and slows reaction time. These are the most dangerous effects because you may not notice them.'},
+  {cat:'dui',q:'You are taking prescription medication. When is it safe to drive?',opts:['Always — prescriptions are legal','After checking whether the medication affects driving ability','Only if the dosage is low','Whenever you feel fine'],correct:1,expl:'Legal does not mean safe to drive on. Many prescriptions impair driving. Always read the label and consult your doctor. Driving while impaired by any substance — legal or not — is DUI in Washington.'},
+  {cat:'dui',q:'Can you be charged with DUI in Washington if your BAC is below 0.08%?',opts:['No — below 0.08% is always legal','Yes — if your driving is impaired you can be charged at any BAC','Only if you are under 21','Only if you caused an accident'],correct:1,expl:'Yes. Washington can charge you with DUI at any BAC if an officer determines your driving ability is impaired. The 0.08% limit is a legal presumption — not a guaranteed safe level.'},
+  {cat:'dui',q:'Drinking alcohol is most dangerous for driving because:',opts:['It improves confidence but reduces speed judgment','It impairs judgment before the drinker feels impaired','It only affects reaction time, not decisions','It affects vision but not coordination'],correct:1,expl:'The most dangerous aspect of alcohol is that it impairs judgment before drinkers realize they are impaired. Legally drunk people often believe they are driving fine — this leads to the most dangerous decisions.'},
+  {cat:'safe',q:'What is the minimum following distance behind the vehicle ahead in good conditions?',opts:['1 second','2 seconds','3 seconds','4 seconds'],correct:2,expl:'The 3-second rule: when the car ahead passes a fixed object, count to 3. If you reach that object before 3 seconds, you are too close. In bad weather, increase to at least 6 seconds.'},
+  {cat:'safe',q:'Your vehicle starts to hydroplane on a wet road. What should you do?',opts:['Apply the brakes firmly','Steer sharply left then right to regain grip','Ease off the accelerator and hold the steering wheel steady','Accelerate through the water to regain traction'],correct:2,expl:'When hydroplaning, your tires are on top of water, not the road. Do not brake hard — it can cause a spin. Ease off the gas, hold the wheel straight, and let the car slow down naturally until tires regain contact.'},
+  {cat:'safe',q:'What should you do if your brakes fail while driving?',opts:['Turn off the engine immediately','Pump the brakes (non-ABS), shift to a lower gear, apply emergency brake gently','Swerve to the shoulder at full speed','Open the door to create drag'],correct:1,expl:'If brakes fail: pump them (non-ABS vehicles), downshift for engine braking, and gently apply the emergency brake. Steer toward the shoulder or uphill to use gravity to slow down.'},
+  {cat:'safe',q:'Your car skids on ice. What is the correct response?',opts:['Brake hard immediately','Steer opposite to the direction of the skid','Ease off the gas and steer toward where you want to go','Accelerate to regain traction'],correct:2,expl:'In an ice skid, do not brake hard. Remove your foot from the accelerator and steer gently in the direction you want to go. For rear skids, steer into the skid direction to straighten out.'},
+  {cat:'safe',q:'When should you use your vehicle\'s high-beam headlights?',opts:['Always at night','On open roads when no oncoming traffic is within 500 feet','In fog for better visibility','Whenever roads are wet at night'],correct:1,expl:'Use high beams on open rural roads when no oncoming vehicle is within 500 feet. Dim them within 300 feet of a vehicle you are following. Never use high beams in fog — they reduce visibility.'},
+  {cat:'safe',q:'You are driving in heavy fog. You should:',opts:['Use high beams for maximum visibility','Turn on hazard lights and maintain normal speed','Use low-beam headlights and slow down significantly','Pull to the center lane away from the edge'],correct:2,expl:'In fog, use low beams (high beams reflect off fog and reduce visibility). Slow down significantly, increase following distance, and pull off if visibility is dangerously low.'},
+  {cat:'safe',q:'In freezing temperatures, the road has a dark wet-looking sheen but there is no rain. This likely means:',opts:['The road was recently resurfaced','Black ice — extremely slippery, treat with great caution','Standing water — hydroplaning risk','Road salt residue'],correct:1,expl:'Black ice is nearly invisible, forming a thin transparent layer on pavement. In WA winters, if temperatures are at or below freezing and the road looks wet without rain — assume black ice and slow down dramatically.'},
+  {cat:'safe',q:'Why should you increase following distance behind a large truck?',opts:['Trucks take longer to accelerate','You cannot see past the truck and it needs more stopping distance','Trucks have wider turns','Trucks cannot brake in rain'],correct:1,expl:'Large trucks have massive blind spots and need far greater stopping distances. If you cannot see the truck\'s mirrors, the driver cannot see you. Give trucks at least 4-6 seconds of following distance.'},
+  {cat:'safe',q:'What is the correct action when you miss your freeway exit?',opts:['Back up on the shoulder to the exit','Cut across the solid white line quickly','Continue to the next exit and turn around','Stop on the shoulder and wait for a gap'],correct:2,expl:'Never back up on a freeway — it is extremely dangerous and illegal. Never cross solid white lines. Continue to the next exit, leave safely, and find a legal place to turn around.'},
+  {cat:'safe',q:'When parallel parking, your wheels must be within how many inches of the curb?',opts:['6 inches','12 inches','18 inches','24 inches'],correct:1,expl:'Washington law requires your right-side wheels to be within 12 inches of the curb when parallel parking. Parking too far from the curb can obstruct traffic and is a citable offense.'},
+  {cat:'safe',q:'Traffic is backed up past an intersection and you have a green light. You should:',opts:['Enter since you have a green light','Wait before the intersection until traffic clears enough to fully pass through','Honk and push through — you have right-of-way','Change lanes to find a clearer path'],correct:1,expl:'"Blocking the box" — entering an intersection you cannot clear — obstructs cross traffic. Wait before the stop line until there is enough space for your vehicle to fully pass through.'},
+  {cat:'safe',q:'How should you merge onto a freeway from an on-ramp?',opts:['Stop at the end of the on-ramp and wait for a gap','Slowly enter and let traffic go around you','Accelerate to match freeway speed, signal, and merge when a safe gap appears','Enter immediately — freeway traffic must yield to you'],correct:2,expl:'Use the acceleration lane to match the speed of freeway traffic. Signal your intent, find a safe gap, and merge smoothly. Do not stop at the end of the ramp unless absolutely forced to.'},
+  {cat:'safe',q:'You experience a tire blowout at highway speed. You should:',opts:['Brake hard to stop as fast as possible','Grip the wheel firmly, ease off the gas, let the car slow, steer to the shoulder','Swerve immediately to the shoulder at full speed','Turn off the engine to slow down'],correct:1,expl:'In a blowout, grip the wheel firmly — do not panic-brake. Ease off the gas gradually, let the car decelerate naturally, then gently steer to the shoulder and come to a safe stop.'},
+];
+
+const pillClass={signs:'pill-signs',laws:'pill-laws',row:'pill-row',dui:'pill-dui',safe:'pill-safe'};
+const catName={signs:'Road signs',laws:'WA traffic laws',row:'Right-of-way',dui:'DUI & alcohol',safe:'Safe driving'};
+const STORAGE_KEY='ptw_state_v1';
+
+const state={
+  pCat:'all',pQueue:[],pIdx:0,pAnswered:false,
+  pCorrect:0,pTotal:0,pStreak:0,
+  wrongBank:[],
+  cIdx:0,cAnswered:false,cCorrect:0,cTotal:0,
+  simQueue:[],simIdx:0,simAnswered:false,
+  simCorrect:0,simTotal:0,
+  simStart:null,simTimerInterval:null
+};
+
+function saveState(){
+  try{
+    const toSave={
+      pCorrect:state.pCorrect,pTotal:state.pTotal,pStreak:state.pStreak,
+      wrongBank:state.wrongBank,
+      cCorrect:state.cCorrect,cTotal:state.cTotal
+    };
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(toSave));
+    document.getElementById('save-status').textContent='Progress saved automatically to this browser.';
+  }catch(e){}
+}
+
+function loadState(){
+  try{
+    const saved=localStorage.getItem(STORAGE_KEY);
+    if(!saved) return;
+    const d=JSON.parse(saved);
+    state.pCorrect=d.pCorrect||0;
+    state.pTotal=d.pTotal||0;
+    state.pStreak=d.pStreak||0;
+    state.wrongBank=d.wrongBank||[];
+    state.cCorrect=d.cCorrect||0;
+    state.cTotal=d.cTotal||0;
+    if(state.pTotal>0){
+      document.getElementById('save-status').textContent=
+        'Welcome back! Resuming your progress — '+state.pCorrect+'/'+state.pTotal+' correct so far.';
+    }
+  }catch(e){}
+}
+
+function clearProgress(){
+  if(!confirm('Reset all your progress? This cannot be undone.')) return;
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  state.pCorrect=0;state.pTotal=0;state.pStreak=0;
+  state.wrongBank=[];state.cIdx=0;state.cAnswered=false;
+  state.cCorrect=0;state.cTotal=0;
+  updatePStats();
+  document.getElementById('save-status').textContent='Progress cleared. Starting fresh!';
+}
+
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+
+function getQueue(cat){
+  return shuffle(cat==='all'?[...QUESTIONS]:QUESTIONS.filter(q=>q.cat===cat));
+}
+
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  document.getElementById(t).classList.add('active');
+  const map={practice:0,challenge:1,simulator:2,plan:3,tips:4};
+  document.querySelectorAll('.tab')[map[t]].classList.add('active');
+  if(t==='challenge') renderChallenge();
+}
+
+function selectCat(btn){
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state.pCat=btn.dataset.cat;
+  state.pQueue=getQueue(state.pCat);
+  state.pIdx=0;state.pAnswered=false;
+  renderQ();
+}
+
+function updatePStats(){
+  document.getElementById('s-correct').textContent=state.pCorrect;
+  document.getElementById('s-total').textContent=state.pTotal;
+  document.getElementById('s-pct').textContent=state.pTotal>0?Math.round((state.pCorrect/state.pTotal)*100)+'%':'—';
+  document.getElementById('s-streak').textContent=state.pStreak;
+  document.getElementById('s-streak2').textContent=state.pStreak;
+  document.getElementById('pfill').style.width=Math.min(100,Math.round((state.pCorrect/32)*100))+'%';
+}
+
+function renderQ(){
+  const q=state.pQueue[state.pIdx%state.pQueue.length];
+  document.getElementById('q-topic').textContent=catName[q.cat];
+  document.getElementById('q-topic').className='topic-pill '+(pillClass[q.cat]||'pill-signs');
+  document.getElementById('q-num').textContent='Question '+(state.pTotal+1);
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('q-expl').className='expl';
+  document.getElementById('q-expl-text').textContent='';
+  document.getElementById('q-next').style.display='none';
+  state.pAnswered=false;
+  const c=document.getElementById('q-opts');c.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');d.className='opt';
+    d.innerHTML='<span class="lt">'+String.fromCharCode(65+i)+'.</span><span>'+o+'</span>';
+    d.onclick=()=>answerP(i,q,c);c.appendChild(d);
+  });
+}
+
+function answerP(i,q,c){
+  if(state.pAnswered)return;
+  state.pAnswered=true;state.pTotal++;
+  c.querySelectorAll('.opt').forEach((d,idx)=>{
+    if(idx===q.correct)d.classList.add('correct');
+    else if(idx===i)d.classList.add('wrong');
+    else d.classList.add('dimmed');
+  });
+  if(i===q.correct){state.pCorrect++;state.pStreak++;}
+  else{state.pStreak=0;if(!state.wrongBank.find(x=>x.q===q.q))state.wrongBank.push(q);}
+  updatePStats();
+  document.getElementById('q-expl-text').textContent=q.expl;
+  document.getElementById('q-expl').className='expl show';
+  document.getElementById('q-next').style.display='block';
+  saveState();
+}
+
+function nextPractice(){
+  state.pIdx++;
+  if(state.pIdx>=state.pQueue.length){state.pQueue=shuffle(state.pQueue);state.pIdx=0;}
+  state.pAnswered=false;renderQ();
+}
+
+function renderChallenge(){
+  const bank=state.wrongBank;
+  const empty=document.getElementById('chal-empty');
+  const content=document.getElementById('chal-content');
+  if(!bank.length){empty.style.display='block';content.style.display='none';return;}
+  empty.style.display='none';content.style.display='block';
+  document.getElementById('c-bank').textContent=bank.length;
+  document.getElementById('c-cleared').textContent=state.cCorrect;
+  document.getElementById('c-total').textContent=state.cTotal;
+  document.getElementById('c-pct').textContent=state.cTotal>0?Math.round((state.cCorrect/state.cTotal)*100)+'%':'—';
+  document.getElementById('c-pfill').style.width=state.cTotal>0?Math.round((state.cCorrect/state.cTotal)*100)+'%':'0%';
+  if(!state.cAnswered)renderCQ();
+}
+
+function renderCQ(){
+  const bank=state.wrongBank;
+  if(!bank.length)return;
+  const q=bank[state.cIdx%bank.length];
+  document.getElementById('c-topic').textContent=catName[q.cat];
+  document.getElementById('c-topic').className='topic-pill '+(pillClass[q.cat]||'pill-signs');
+  document.getElementById('c-num').textContent='Drilling '+bank.length+' weak spot'+(bank.length!==1?'s':'');
+  document.getElementById('c-text').textContent=q.q;
+  document.getElementById('c-expl').className='expl';
+  document.getElementById('c-expl-text').textContent='';
+  document.getElementById('c-next').style.display='none';
+  document.getElementById('c-status').textContent='';
+  state.cAnswered=false;
+  const c=document.getElementById('c-opts');c.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');d.className='opt';
+    d.innerHTML='<span class="lt">'+String.fromCharCode(65+i)+'.</span><span>'+o+'</span>';
+    d.onclick=()=>answerC(i,q,c);c.appendChild(d);
+  });
+}
+
+function answerC(i,q,c){
+  if(state.cAnswered)return;
+  state.cAnswered=true;state.cTotal++;
+  c.querySelectorAll('.opt').forEach((d,idx)=>{
+    if(idx===q.correct)d.classList.add('correct');
+    else if(idx===i)d.classList.add('wrong');
+    else d.classList.add('dimmed');
+  });
+  if(i===q.correct){state.cCorrect++;state.wrongBank=state.wrongBank.filter(x=>x.q!==q.q);}
+  document.getElementById('c-expl-text').textContent=q.expl;
+  document.getElementById('c-expl').className='expl show';
+  document.getElementById('c-next').style.display='block';
+  document.getElementById('c-bank').textContent=state.wrongBank.length;
+  document.getElementById('c-cleared').textContent=state.cCorrect;
+  document.getElementById('c-total').textContent=state.cTotal;
+  document.getElementById('c-pct').textContent=Math.round((state.cCorrect/state.cTotal)*100)+'%';
+  if(!state.wrongBank.length){
+    document.getElementById('c-num').textContent='Challenge bank cleared!';
+    document.getElementById('c-status').innerHTML='<span style="color:var(--teal);font-weight:600">All weak spots cleared!</span>';
+  }
+  saveState();
+}
+
+function nextChallenge(){
+  state.cIdx++;state.cAnswered=false;
+  if(!state.wrongBank.length){renderChallenge();return;}
+  renderCQ();
+}
+
+function startSim(){
+  document.getElementById('sim-start').style.display='none';
+  document.getElementById('sim-running').style.display='block';
+  document.getElementById('sim-result').style.display='none';
+  let pool=shuffle([...QUESTIONS]);
+  state.simQueue=pool.length>=40?pool.slice(0,40):[...pool,...shuffle([...pool])].slice(0,40);
+  state.simIdx=0;state.simAnswered=false;state.simCorrect=0;state.simTotal=0;
+  state.simStart=Date.now();
+  if(state.simTimerInterval)clearInterval(state.simTimerInterval);
+  state.simTimerInterval=setInterval(updateSimTimer,1000);
+  renderSimQ();
+}
+
+function updateSimTimer(){
+  const e=Math.floor((Date.now()-state.simStart)/1000);
+  const m=Math.floor(e/60).toString().padStart(2,'0');
+  const s=(e%60).toString().padStart(2,'0');
+  document.getElementById('sim-timer').textContent=m+':'+s;
+}
+
+function renderSimQ(){
+  const q=state.simQueue[state.simIdx];
+  document.getElementById('sim-topic').textContent=catName[q.cat];
+  document.getElementById('sim-topic').className='topic-pill '+(pillClass[q.cat]||'pill-signs');
+  document.getElementById('sim-text').textContent=q.q;
+  document.getElementById('sim-expl').className='expl';
+  document.getElementById('sim-expl-text').textContent='';
+  document.getElementById('sim-next').style.display='none';
+  document.getElementById('sim-prog').textContent='Question '+(state.simIdx+1)+' of 40';
+  document.getElementById('sim-score-live').textContent='Score: '+state.simCorrect+' / '+state.simIdx;
+  document.getElementById('sim-remain').textContent=(40-state.simIdx-1)+' questions remaining';
+  document.getElementById('sim-pfill').style.width=Math.round(((state.simIdx+1)/40)*100)+'%';
+  state.simAnswered=false;
+  const c=document.getElementById('sim-opts');c.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');d.className='opt';
+    d.innerHTML='<span class="lt">'+String.fromCharCode(65+i)+'.</span><span>'+o+'</span>';
+    d.onclick=()=>answerSim(i,q,c);c.appendChild(d);
+  });
+}
+
+function answerSim(i,q,c){
+  if(state.simAnswered)return;
+  state.simAnswered=true;state.simTotal++;
+  c.querySelectorAll('.opt').forEach((d,idx)=>{
+    if(idx===q.correct)d.classList.add('correct');
+    else if(idx===i)d.classList.add('wrong');
+    else d.classList.add('dimmed');
+  });
+  if(i===q.correct)state.simCorrect++;
+  else if(!state.wrongBank.find(x=>x.q===q.q))state.wrongBank.push(q);
+  document.getElementById('sim-expl-text').textContent=q.expl;
+  document.getElementById('sim-expl').className='expl show';
+  if(state.simIdx<39){document.getElementById('sim-next').style.display='block';}
+  else{setTimeout(showSimResult,900);}
+  saveState();
+}
+
+function nextSim(){state.simIdx++;state.simAnswered=false;renderSimQ();}
+
+function showSimResult(){
+  clearInterval(state.simTimerInterval);
+  document.getElementById('sim-running').style.display='none';
+  document.getElementById('sim-result').style.display='block';
+  const pct=Math.round((state.simCorrect/40)*100);
+  const pass=pct>=80;
+  const e=Math.floor((Date.now()-state.simStart)/1000);
+  const m=Math.floor(e/60).toString().padStart(2,'0');
+  const s=(e%60).toString().padStart(2,'0');
+  document.getElementById('sr-pct').textContent=pct+'%';
+  document.getElementById('sr-pct').className='sim-score-big '+(pass?'pass':'fail');
+  document.getElementById('sr-verdict').textContent=pass?'You passed!':'Not yet — keep drilling';
+  document.getElementById('sr-sub').textContent=pass?
+    state.simCorrect+'/40 correct. You are ready for the real test!':
+    state.simCorrect+'/40 correct. You need 32 to pass. Your weak spots are now in the Challenge Bank.';
+  document.getElementById('sr-correct').textContent=state.simCorrect;
+  document.getElementById('sr-wrong').textContent=40-state.simCorrect;
+  document.getElementById('sr-time').textContent=m+':'+s;
+}
+
+loadState();
+state.pQueue=getQueue('all');
+updatePStats();
+renderQ();
+</script>
+</body>
+</html>
